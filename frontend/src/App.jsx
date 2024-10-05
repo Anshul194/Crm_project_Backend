@@ -12,7 +12,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/sidebar" element={<Sidebar />} />
-
       </Routes>
     </Router>
     </>
