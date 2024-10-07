@@ -2,6 +2,7 @@ import express from "express";
 import connectDb from "./config/dbConnection.js";
 import dotenv from "dotenv";
 import routes from "./routes/employeeRouter.js";
+import router from "./routes/departmentRouter.js";
 
 dotenv.config();
 const app = express();
@@ -22,3 +23,4 @@ connectDb()
 
 //Routers
 app.use("/api/employee", routes);
+app.use("/api/department", router);

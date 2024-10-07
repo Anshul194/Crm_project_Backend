@@ -38,6 +38,7 @@ export const addEmployee = async (req, res) => {
       !gender ||
       !phone ||
       !post ||
+      !departmentId ||
       !address ||
       !city ||
       !state ||
@@ -54,7 +55,7 @@ export const addEmployee = async (req, res) => {
         .json({ message: "Please provide all required fields!" });
     }
 
-    const image = `/uploads/${req.file.filename}`;
+    const image = `/uploads/${req?.file?.filename}`;
 
     //checking employee is exist or not
     const exisitingEmployee = await Employee.findOne({ email });
@@ -97,8 +98,11 @@ export const addEmployee = async (req, res) => {
     //Save New Employee
     await newEmployee.save();
 
+    //Add Employee in their deparments model
+
     //Sending username and password through email
     sendMail(full_name, email, password);
+
     return res
       .status(200)
       .json({ message: "New Employee registered successfully!" });
@@ -188,10 +192,11 @@ export const removeEmployee = async (req, res) => {
     if (!id) {
       return res.status(400).json({ message: "Please provide employee id!" });
     }
-    const emp = await Employee.findByIdAndDelete(id);
-    if (!emp) {
+    const isEmpExist = await Employee.findById(id);
+    if (!isEmpExist) {
       return res.status(404).json({ message: "Employee not found!" });
     }
+    await Employee.findByIdAndDelete(id);
     return res.status(200).json({ message: "Employee removed successfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error!" });
@@ -237,6 +242,82 @@ export const updatePassword = async (req, res) => {
     });
 
     return res.status(200).json({ message: "Password updated successfully!" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error!" });
+  }
+};
+
+//Update Employee Details
+export const updateEmpDetails = async (req, res) => {
+  try {
+    const {
+      full_name,
+      phone,
+      post,
+      departmentId,
+      address,
+      city,
+      state,
+      country,
+      college,
+      qualification,
+      qualificationYear,
+    } = req.body;
+
+    const { id } = req.headers;
+
+    const user = req.user;
+    if (!user.isAdmin) {
+      return res
+        .status(401)
+        .json({ message: "You do not have permission to access this page." });
+    }
+
+    if (
+      !full_name ||
+      !phone ||
+      !post ||
+      !departmentId ||
+      !address ||
+      !city ||
+      !state ||
+      !country ||
+      !college ||
+      !qualification ||
+      !qualificationYear
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please provide all required field!" });
+    }
+
+    const emp = await Employee.findById(id);
+
+    //Employee not found
+    if (!emp) {
+      return res.status(404).json({ message: "Employee not found!" });
+    }
+
+    //Updating Employee
+    await emp.updateOne({
+      $set: {
+        full_name,
+        phone,
+        post,
+        departments: departmentId,
+        address,
+        city,
+        state,
+        country,
+        college,
+        qualification,
+        qualificationYear,
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Employee details updated successfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error!" });
   }

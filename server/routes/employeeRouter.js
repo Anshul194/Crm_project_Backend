@@ -8,6 +8,7 @@ import {
   removeEmployee,
   updatePassword,
   removedFromDepartment,
+  updateEmpDetails,
 } from "../controller/employeeController.js";
 import upload from "../multer/multer.js";
 import { authenticationToken } from "../auth/auth.js";
@@ -23,6 +24,7 @@ router
   .get(authenticationToken, getAllEmployee);
 router.route("/remove-employee").delete(authenticationToken, removeEmployee);
 router.route("/update-password").put(authenticationToken, updatePassword);
+router.route("/update-employee").put(authenticationToken, updateEmpDetails);
 router.route("/add-deparment").put(authenticationToken, addIntoDepartment);
 router
   .route("/remove-from-deparment")
